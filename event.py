@@ -35,7 +35,7 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 def save(collection_id, event_tag, event_title, event_body):
-    db.collection(collection_id).document(event_tag).document(event_title).document(event_body)
+    db.collection(collection_id).document(event_tag).document(event_title).data(event_body)
 
 save(
     collection_id = "event_1",
