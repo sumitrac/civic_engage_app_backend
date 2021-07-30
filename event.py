@@ -27,6 +27,28 @@ print(event_title)
 print(event_body)
 
 
+# def find_event_div(tag):
+#     if tag.name != "div":
+#         return False 
+#     if not tag.has_attr("class"):
+#         return False 
+#     if "views-field" not in tag["class"]:
+#         return False 
+#     # if tag:
+#     h2 = tag.find("h2")
+#     if h2 is None:
+#         return False 
+#     return True
+# # events = soup.find_all('div', class_="views-field")
+# events = soup.find_all(find_event_div)
+
+# for event in events:
+#     print(event.text)
+#     print("------------------")
+
+# create function to especific tags 
+
+
 # Sending data to firestore 
 cred = credentials.Certificate("civic-engage-capstone-firebase-adminsdk-hkf3r-17f4b9b0b2.json")
 firebase_admin.initialize_app(cred)
@@ -42,8 +64,8 @@ def save(collection_id, document_id, event_tag, event_title, event_body):
 save(
     collection_id = "event_1",
     document_id= "document_id",
-    event_tag = "event_tag",
-    event_title = "event_title",
-    event_body = "event_body"
+    event_tag = event_tag,
+    event_title = event_title,
+    event_body = event_body
 )
 
