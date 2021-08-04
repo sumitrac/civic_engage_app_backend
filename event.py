@@ -7,6 +7,76 @@ import firebase_admin
 from firebase_admin import credentials 
 from firebase_admin import firestore 
 
+#Section to get all event data from external site 
+url = "https://www.portland.gov/events"
+
+# print(response) | gave success response 200 
+response = requests.get(url)
+# print(html) | printed all html 
+html = response.content 
+# print(soup ) | little better to look at it 
+soup = bs(html, "lxml")  
+
+#Section for firestore credentials 
+cred = credentials.Certificate("civic-engage-capstone-firebase-adminsdk-hkf3r-17f4b9b0b2.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
+
+# Function to get all 
+def save(collection_id, event_tag, event_title, event_start_date, event_end_date, event_des):
+    db.collection(collection_id).add({"tag": event_tag, "title": event_title, "event_start": event_start_date, "event_end": event_end_date, "desc": event_des})
+
+event_list = soup.find_all("div", class_="views-field views-field-search-api-rendered-item")
+
+for event in event_list: #loop through each event
+    # gets event tags 
+    event_tag = soup.find('div', class_="badge badge-pill text-wrap text-left badge-light").get_text(strip=True) 
+    # print(event_tag.get_text(strip=True))
+
+    # gets event titles 
+    event_title = event.find("span", class_="field field--name-title field--type-string field--label-hidden").get_text(strip=True) 
+    # print(event_title.get_text(strip=True))
+
+    # gets event start date
+    event_start_date = soup.find("div", class_="field field--name-field-start-date field--type-datetime field--label-hidden").get_text(strip=True) 
+    # print(event_start_date.get_text(strip=True))
+
+    # prints event end data 
+    event_end_date = soup.find("div", class_="field field--name-field-end-date field--type-datetime field--label-hidden").get_text(strip=True) 
+    # print(event_end_date.get_text(strip=True))
+
+    # prints event description 
+    event_des = soup.find("div", class_="morsel__text").get_text(strip=True)
+    # print(event_des.get_text(strip=True))
+
+    save(
+        collection_id = "meetings",
+        event_tag = event_tag,
+        event_title = event_title,
+        event_start_date = event_start_date,
+        event_end_date = event_end_date,
+        event_des = event_des
+    )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # # Getting data from external site using BeautifulSoup 
 # html_text = requests.get('https://www.portland.gov/events').text
 # soup = BeautifulSoup(html_text, 'html.parser')    
@@ -71,15 +141,7 @@ from firebase_admin import firestore
 #     meeting_description = meeting_description
 # )
 
-# new section to get meetings data
-url = "https://www.portland.gov/events"
-response = requests.get(url)
-# print(response) | gave success response 200 
-html = response.content 
-# print(html) | printed all html 
 
-soup = bs(html, "lxml")  
-# print(soup ) | little better to look at it 
 
 # # prints event tags 
 # event_tag = soup.find_all('div', class_="badge badge-pill text-wrap text-left badge-light")
@@ -143,51 +205,6 @@ soup = bs(html, "lxml")
 #     print_des = print_des
 # )
 
-cred = credentials.Certificate("civic-engage-capstone-firebase-adminsdk-hkf3r-17f4b9b0b2.json")
-firebase_admin.initialize_app(cred)
-db = firestore.client()
-
-def save(collection_id, event_tag, event_title, event_start_date, event_end_date, event_des):
-    # help(db.collection(collection_id).document(event_tag))
-    # db.collection(collection_id).document(event_tag).set({"title": event_title, "body": event_body})
-    # db.collection(collection_id).document(document_id).set({"tag": meeting_tag, "title": meeting_title, "desc": meeting_description})
-    db.collection(collection_id).add({"tag": event_tag, "title": event_title, "event_start": event_start_date, "event_end": event_end_date, "desc": event_des})
-
-events = soup.find_all("div", class_="views-field views-field-search-api-rendered-item")
-# def print_d(event_date_time):
-for event in events: #loop through each event
-    # gets event tags 
-    event_tag = soup.find('div', class_="badge badge-pill text-wrap text-left badge-light").get_text(strip=True) 
-    # print(event_tag.get_text(strip=True))
-
-    # gets event titles 
-    event_title = event.find("span", class_="field field--name-title field--type-string field--label-hidden").get_text(strip=True) 
-    # print(event_title.get_text(strip=True))
-
-    # gets event start date
-    event_start_date = soup.find("div", class_="field field--name-field-start-date field--type-datetime field--label-hidden").get_text(strip=True) 
-    # print(event_start_date.get_text(strip=True))
-
-    # prints event end data 
-    event_end_date = soup.find("div", class_="field field--name-field-end-date field--type-datetime field--label-hidden").get_text(strip=True) 
-    # print(event_end_date.get_text(strip=True))
-
-    # prints event description 
-    event_des = soup.find("div", class_="morsel__text").get_text(strip=True)
-    # # "field field--name-field-summary field--type-string field--label-hidden")
-    # print(event_des.get_text(strip=True))
-
-    save(
-        collection_id = "meetings",
-        # document_id= document_id,
-        event_tag = event_tag,
-        event_title = event_title,
-        event_start_date = event_start_date,
-        event_end_date = event_end_date,
-        event_des = event_des
-)
-
-
     # # prints all date and time.............
     # event_date_time = soup.find_all("span", class_="d-flex align-items-center")
     # def print_date_time(event_date_time):
@@ -199,8 +216,6 @@ for event in events: #loop through each event
         # print all day
     # else:
         # print(start time) and end time
-
-  
 
 # Section to send data to Firestore 
 # cred = credentials.Certificate("civic-engage-capstone-firebase-adminsdk-hkf3r-17f4b9b0b2.json")
