@@ -28,26 +28,40 @@ def save(collection_id, event_tag, event_title, event_start_date, event_end_date
 
 event_list = soup.find_all("div", class_="views-field views-field-search-api-rendered-item")
 
+
 for event in event_list: #loop through each event
     # gets event tags 
-    event_tag = soup.find('div', class_="badge badge-pill text-wrap text-left badge-light").get_text(strip=True) 
+    # print(event)
+    if event.find("div", class_="badge badge-pill text-wrap text-left badge-light"):
+        # print("hello")
+        event_tag = event.find("div", class_="badge badge-pill text-wrap text-left badge-light").get_text(strip=True) 
+
     # print(event_tag.get_text(strip=True))
+    # print(event_tag)
 
     # gets event titles 
     event_title = event.find("span", class_="field field--name-title field--type-string field--label-hidden").get_text(strip=True) 
     # print(event_title.get_text(strip=True))
+    # print(event_title)
 
     # gets event start date
-    event_start_date = soup.find("div", class_="field field--name-field-start-date field--type-datetime field--label-hidden").get_text(strip=True) 
+    event_start_date = event.find("div", class_="field field--name-field-start-date field--type-datetime field--label-hidden").get_text(strip=True) 
     # print(event_start_date.get_text(strip=True))
 
     # prints event end data 
-    event_end_date = soup.find("div", class_="field field--name-field-end-date field--type-datetime field--label-hidden").get_text(strip=True) 
+    if event.find("div", class_="field field--name-field-end-date field--type-datetime field--label-hidden"):
+        event_end_date = event.find("div", class_="field field--name-field-end-date field--type-datetime field--label-hidden").get_text(strip=True) 
+    else: 
+        event_end_date = None 
     # print(event_end_date.get_text(strip=True))
 
     # prints event description 
-    event_des = soup.find("div", class_="morsel__text").get_text(strip=True)
+    event_des = event.find("div", class_="morsel__text").get_text(strip=True)
     # print(event_des.get_text(strip=True))
+    # print(event_des)
+
+    # more_info = event.div.h2.a
+    # print(more_info)
 
     save(
         collection_id = "meetings",
@@ -56,6 +70,7 @@ for event in event_list: #loop through each event
         event_start_date = event_start_date,
         event_end_date = event_end_date,
         event_des = event_des
+        # more_info = more_info
     )
 
 
