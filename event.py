@@ -16,9 +16,9 @@ def save(collection_id, tag, title, start_date, end_date, desc, info_link):
     db.collection(collection_id).add({"tag": tag, "title": title, "start_date": start_date, "end_date": end_date, "desc": desc, "info_link": info_link})
 
 #Section to get all event data from external site 
-page = 0
+page = 1
 url = f"https://www.portland.gov/events?page={page}"
-# url = "https://www.portland.gov/events/page/"
+
 for page in range(1, 10):
     # print(response) | gave success response 200 
     # response = requests.get(url + str(page) + '/')
@@ -27,6 +27,7 @@ for page in range(1, 10):
     html = response.content 
     # print(soup ) | little better to look at it 
     soup = bs(html, "lxml")  
+    page = page + 1
 
 #Section for firestore credentials 
 # cred = credentials.Certificate("civic-engage-capstone-firebase-adminsdk-hkf3r-17f4b9b0b2.json")
