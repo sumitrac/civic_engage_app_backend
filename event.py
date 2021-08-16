@@ -7,17 +7,6 @@ import firebase_admin
 from firebase_admin import credentials 
 from firebase_admin import firestore 
 
-#Section to get all event data from external site 
-url = "https://www.portland.gov/events"
-
-# print(response) | gave success response 200 
-response = requests.get(url)
-# print(html) | printed all html 
-html = response.content 
-# print(soup ) | little better to look at it 
-soup = bs(html, "lxml")  
-
-#Section for firestore credentials 
 cred = credentials.Certificate("civic-engage-capstone-firebase-adminsdk-hkf3r-17f4b9b0b2.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
@@ -26,54 +15,75 @@ db = firestore.client()
 def save(collection_id, tag, title, start_date, end_date, desc, info_link):
     db.collection(collection_id).add({"tag": tag, "title": title, "start_date": start_date, "end_date": end_date, "desc": desc, "info_link": info_link})
 
-event_list = soup.find_all("div", class_="views-field views-field-search-api-rendered-item")
+#Section to get all event data from external site 
+page = 0
+url = f"https://www.portland.gov/events?page={page}"
+# url = "https://www.portland.gov/events/page/"
+for page in range(1, 10):
+    # print(response) | gave success response 200 
+    # response = requests.get(url + str(page) + '/')
+    response = requests.get(url)
+    # print(html) | printed all html 
+    html = response.content 
+    # print(soup ) | little better to look at it 
+    soup = bs(html, "lxml")  
 
+#Section for firestore credentials 
+# cred = credentials.Certificate("civic-engage-capstone-firebase-adminsdk-hkf3r-17f4b9b0b2.json")
+# firebase_admin.initialize_app(cred)
+# db = firestore.client()
 
-for event in event_list: #loop through each event
-    # gets event tags 
-    # print(event)
-    if event.find("div", class_="badge badge-pill text-wrap text-left badge-light"):
-        # print("hello")
-        tag = event.find("div", class_="badge badge-pill text-wrap text-left badge-light").get_text(strip=True) 
+# # Function to get all 
+# def save(collection_id, tag, title, start_date, end_date, desc, info_link):
+#     db.collection(collection_id).add({"tag": tag, "title": title, "start_date": start_date, "end_date": end_date, "desc": desc, "info_link": info_link})
 
-    # print(event_tag.get_text(strip=True))
-    # print(event_tag)
+    event_list = soup.find_all("div", class_="views-field views-field-search-api-rendered-item")
 
-    # gets event titles 
-    title = event.find("span", class_="field field--name-title field--type-string field--label-hidden").get_text(strip=True) 
-    # print(event_title.get_text(strip=True))
-    # print(event_title)
+    for event in event_list: #loop through each event
+        # gets event tags 
+        # print(event)
+        if event.find("div", class_="badge badge-pill text-wrap text-left badge-light"):
+            # print("hello")
+            tag = event.find("div", class_="badge badge-pill text-wrap text-left badge-light").get_text(strip=True) 
 
-    # gets event start date
-    start_date = event.find("div", class_="field field--name-field-start-date field--type-datetime field--label-hidden").get_text(strip=True) 
-    # print(event_start_date.get_text(strip=True))
+        # print(event_tag.get_text(strip=True))
+        # print(event_tag)
 
-    # prints event end data 
-    if event.find("div", class_="field field--name-field-end-date field--type-datetime field--label-hidden"):
-        end_date = event.find("div", class_="field field--name-field-end-date field--type-datetime field--label-hidden").get_text(strip=True) 
-    else: 
-        end_date = None 
-    # print(event_end_date.get_text(strip=True))
+        # gets event titles 
+        title = event.find("span", class_="field field--name-title field--type-string field--label-hidden").get_text(strip=True) 
+        # print(event_title.get_text(strip=True))
+        # print(event_title)
 
-    # prints event description 
-    desc = event.find("div", class_="morsel__text").get_text(strip=True)
-    # print(event_des.get_text(strip=True))
-    # print(event_des)
+        # gets event start date
+        start_date = event.find("div", class_="field field--name-field-start-date field--type-datetime field--label-hidden").get_text(strip=True) 
+        # print(event_start_date.get_text(strip=True))
 
-    info_link = event.find("span", "h2.a")  #.div.h2.a
-    # print(more_info)
+        # prints event end data 
+        if event.find("div", class_="field field--name-field-end-date field--type-datetime field--label-hidden"):
+            end_date = event.find("div", class_="field field--name-field-end-date field--type-datetime field--label-hidden").get_text(strip=True) 
+        else: 
+            end_date = None 
+        # print(event_end_date.get_text(strip=True))
 
-    # print(url.get('href'))
+        # prints event description 
+        desc = event.find("div", class_="morsel__text").get_text(strip=True)
+        # print(event_des.get_text(strip=True))
+        # print(event_des)
 
-    save(
-        collection_id = "events",
-        tag = tag,
-        title = title,
-        start_date = start_date,
-        end_date = end_date,
-        desc = desc,
-        info_link = info_link
-    )
+        info_link = event.find("span", "h2.a")  #.div.h2.a
+        # print(more_info)
+
+        # print(url.get('href'))
+
+        save(
+            collection_id = "events",
+            tag = tag,
+            title = title,
+            start_date = start_date,
+            end_date = end_date,
+            desc = desc,
+            info_link = info_link
+        )
 
 
 
