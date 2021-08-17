@@ -12,14 +12,14 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 # Function to get all 
-def save(collection_id, tag, title, start_date, end_date, desc, info_link):
-    db.collection(collection_id).add({"tag": tag, "title": title, "start_date": start_date, "end_date": end_date, "desc": desc, "info_link": info_link})
+def save(collection_id, tag, title, start_date, end_date, desc, info_link, incentive):
+    db.collection(collection_id).add({"tag": tag, "title": title, "start_date": start_date, "end_date": end_date, "desc": desc, "info_link": info_link, "incentive": incentive})
 
 #Section to get all event data from external site 
 page = 1
 url = f"https://www.portland.gov/events?page={page}"
 
-for page in range(1, 10):
+for page in range(2):
     # print(response) | gave success response 200 
     # response = requests.get(url + str(page) + '/')
     response = requests.get(url)
@@ -75,6 +75,7 @@ for page in range(1, 10):
         # print(more_info)
 
         # print(url.get('href'))
+        incentive =(" ")
 
         save(
             collection_id = "events",
@@ -83,7 +84,8 @@ for page in range(1, 10):
             start_date = start_date,
             end_date = end_date,
             desc = desc,
-            info_link = info_link
+            info_link = info_link,
+            incentive= incentive
         )
 
 
